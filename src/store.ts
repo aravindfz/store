@@ -6,6 +6,7 @@ import {Operator} from 'rxjs/Operator';
 
 import 'rxjs/Rx';
 
+
 export interface Action {
 	type:string,
 	payload?:any;
@@ -17,10 +18,11 @@ export interface Reducer<T> {
 
 export class Store<T> extends BehaviorSubject<T> {
 	_reducer: Reducer<any>;
-	constructor(reducer:Reducer<any>, initialState:T){
+	constructor(private _dispatcher, reducer:Reducer<any>, initialState:T){
 		
-		super(initialState);
+		super(reducer(initialState, {action: 'INIT__STORE'});
 		this._reducer = reducer;
+		_dispatcher.subscribe(action => super.next(this._reducer(this.value, action)));
 	}
 	
 	select <T, R>(key: string): Observable<R> {
@@ -28,7 +30,7 @@ export class Store<T> extends BehaviorSubject<T> {
 	}
 	
 	next(action:any){
-		super.next(this._reducer(this.value, action));
+	 this._dispatcher.next(action)
 	}
 	
 	dispatch(action:Action):void{
@@ -36,10 +38,17 @@ export class Store<T> extends BehaviorSubject<T> {
 	}
 }
 
+export class Dispatcher<Action> extends Subject<Action> {
+	dispatch(action:Action){
+		this.next(action);
+	}
+}
+
 export const provideStore = (reducers:{[key:string]:Reducer<any>}, initialState:{[key:string]:any} = {}):any[] => {
 	
 	return [
-		provide(Store, {useFactory: createStore(reducers, initialState) }),
+	  Dispatcher,
+		provide(Store, {useFactory: createStore(reducers, initialState), deps: [Dispatcher] }),
 	];
 
 }
@@ -55,10 +64,10 @@ const combineReducers = (reducers) => {
 
 
 export const createStore = (reducers:{[key:string]:Reducer<any>}, initialState:{[key:string]:any} = {}) => {
-	return () => {
+	return (dispatcher) => {
 	
 		
-		let store = new Store(combineReducers(reducers), initialState);
+		let store = new Store(dispatcher, combineReducers(reducers), initialState);
 	
 		return store;	
 	}
