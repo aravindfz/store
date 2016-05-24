@@ -7,4 +7,5 @@ export declare class Dispatcher extends SyncSubject<Action> {
     static INIT: string;
     constructor();
     dispatch(action: Action): void;
+    complete(): void;
 }

@@ -13,6 +13,9 @@ var Dispatcher = (function (_super) {
     Dispatcher.prototype.dispatch = function (action) {
         this.next(action);
     };
+    Dispatcher.prototype.complete = function () {
+        // noop
+    };
     Dispatcher.INIT = '@ngrx/store/init';
     return Dispatcher;
 }(SyncSubject_1.SyncSubject));
