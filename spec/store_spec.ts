@@ -173,5 +173,17 @@ describe('ngRx Store', () => {
       expect(dispatcher.error).toHaveBeenCalledWith(2);
 
     });
+
+    it('should not be completable', function() {
+
+      const storeSubscription = store.subscribe();
+      const dispatcherSubscription = dispatcher.subscribe();
+
+      store.complete();
+      dispatcher.complete();
+
+      expect(storeSubscription.isUnsubscribed).toBe(false);
+      expect(dispatcherSubscription.isUnsubscribed).toBe(false);
+    });
   });
 });

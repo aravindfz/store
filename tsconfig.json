@@ -5,7 +5,7 @@
 		"experimentalDecorators": true,
 		"module": "commonjs",
 		"moduleResolution": "node",
-		"outDir": "./",
+		"outDir": "dist",
 		"declaration": true
 	},
 	"files": [
